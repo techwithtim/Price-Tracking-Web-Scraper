@@ -29,3 +29,8 @@ th {
 tr:nth-child(even) {
   background-color: #f2f2f2;
 }
+
+input {
+  margin-left: 10px;
+  margin-right: 10px;
+}

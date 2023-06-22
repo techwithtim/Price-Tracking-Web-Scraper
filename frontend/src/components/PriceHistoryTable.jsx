@@ -1,6 +1,20 @@
-import React from "react";
+import React, { useState } from "react";
+import ModalComponent from './Modal';
+import ProductDetailsPage from "./ProductDetailsPage";
 
 function PriceHistoryTable({ priceHistory, onClose }) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentProduct, setCurrentProduct] = useState({})
+
+  const openModal = (product) => {
+    setCurrentProduct(product)
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
   const getPriceData = (product) => {
     return product.priceHistory[0];
   };
@@ -20,8 +34,7 @@ function PriceHistoryTable({ priceHistory, onClose }) {
         <thead>
           <tr className="row">
             <th>Updated At</th>
-            <th colspan={3}>Name</th>
-            <th>URL</th>
+            <th>Name</th>
             <th>Price</th>
             <th>Price Change</th>
           </tr>
@@ -30,15 +43,11 @@ function PriceHistoryTable({ priceHistory, onClose }) {
           {priceHistory.map((product) => {
             const priceData = getPriceData(product);
             const change = getPriceChange(product);
-            console.log(priceData);
 
             return (
-              <tr key={product.url} className="row">
+              <tr key={product.url} className="row" onClick={() => openModal(product)}>
                 <td>{priceData.date}</td>
-                <td colspan={3}>{product.name}</td>
-                <td>
-                  <a href={`${product.source}${product.url}`}>Click to view</a>
-                </td>
+                <td >{product.name}</td>
                 <td>${priceData.price}</td>
                 <td style={change > 0 ? { color: "red" } : { color: "green" }}>
                   {change >= 0 ? "+" : "-"}
@@ -50,6 +59,11 @@ function PriceHistoryTable({ priceHistory, onClose }) {
         </tbody>
       </table>
       <button onClick={onClose}>Close</button>
+      <ModalComponent
+        isOpen={isModalOpen}
+        closeModal={closeModal}
+        content={<ProductDetailsPage product={currentProduct} />}
+      />
     </div>
   );
 }
