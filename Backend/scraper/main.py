@@ -63,6 +63,9 @@ async def get_products(page, search_text, selector, get_product):
             async def task(p_div):
                 product = await get_product(p_div)
 
+                if not product["price"] or not product["url"]:
+                    return
+
                 for word in words:
                     if not product["name"] or word.lower() not in product["name"].lower():
                         break
@@ -80,12 +83,15 @@ def save_results(results):
         json.dump(data, f)
 
 
-def post_results(results, url):
+def post_results(results, endpoint, search_text, source):
     headers = {
         "Content-Type": "application/json"
     }
-    print("Sending request to", url)
-    response = post("http://localhost:5000" + url, headers=headers, json={"data": results})
+    data = {"data": results, "search_text": search_text, "source": source}
+
+    print("Sending request to", endpoint)
+    response = post("http://localhost:5000" + endpoint,
+                    headers=headers, json=data)
     print("Status code:", response.status_code)
 
 
@@ -113,7 +119,7 @@ async def main(url, search_text, response_route):
         results = await get_products(search_page, search_text, metadata["product_selector"], func)
         print("Saving results.")
         save_results(results)
-        post_results(results, response_route)
+        post_results(results, response_route, search_text, url)
 
         await browser.close()
 
