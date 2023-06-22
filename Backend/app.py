@@ -30,6 +30,17 @@ class ProductResult(db.Model):
         self.source = source
 
 
+class TrackedProducts(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(1000))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    tracked = db.Column(db.Boolean, default=True)
+
+    def __init__(self, name, tracked=True):
+        self.name = name
+        self.tracked = tracked
+
+
 @app.route('/results', methods=['POST'])
 def submit_results():
     results = request.json.get('data')
@@ -118,6 +129,48 @@ def start_scraper():
 
     response = {'message': 'Scraper started successfully'}
     return jsonify(response), 200
+
+
+@app.route('/add-tracked-product', methods=['POST'])
+def add_tracked_product():
+    name = request.json.get('name')
+    tracked_product = TrackedProducts(name=name)
+    db.session.add(tracked_product)
+    db.session.commit()
+
+    response = {'message': 'Tracked product added successfully',
+                'id': tracked_product.id}
+    return jsonify(response), 200
+
+
+@app.route('/tracked-product/<int:product_id>', methods=['PUT'])
+def toggle_tracked_product(product_id):
+    tracked_product = TrackedProducts.query.get(product_id)
+    if tracked_product is None:
+        response = {'message': 'Tracked product not found'}
+        return jsonify(response), 404
+
+    tracked_product.tracked = not tracked_product.tracked
+    db.session.commit()
+
+    response = {'message': 'Tracked product toggled successfully'}
+    return jsonify(response), 200
+
+
+@app.route('/tracked-products', methods=['GET'])
+def get_tracked_products():
+    tracked_products = TrackedProducts.query.all()
+
+    results = []
+    for product in tracked_products:
+        results.append({
+            'id': product.id,
+            'name': product.name,
+            'created_at': product.created_at,
+            'tracked': product.tracked
+        })
+
+    return jsonify(results), 200
 
 
 if __name__ == '__main__':

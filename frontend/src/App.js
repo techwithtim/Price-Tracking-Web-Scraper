@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import SearchTextList from "./components/SearchTextList";
 import PriceHistoryTable from "./components/PriceHistoryTable";
+import axios from "axios";
+import TrackedProductList from "./components/TrackedProductList";
 
 const URL = "http://localhost:5000";
 
@@ -16,8 +18,8 @@ function App() {
 
   const fetchUniqueSearchTexts = async () => {
     try {
-      const response = await fetch(`${URL}/unique_search_texts`);
-      const data = await response.json();
+      const response = await axios.get(`${URL}/unique_search_texts`);
+      const data = response.data;
       setSearchTexts(data);
     } catch (error) {
       console.error("Error fetching unique search texts:", error);
@@ -26,8 +28,11 @@ function App() {
 
   const handleSearchTextClick = async (searchText) => {
     try {
-      const response = await fetch(`${URL}/results?search_text=${searchText}`);
-      const data = await response.json();
+      const response = await axios.get(
+        `${URL}/results?search_text=${searchText}`
+      );
+
+      const data = response.data;
       setPriceHistory(data);
       setShowPriceHistory(true);
     } catch (error) {
@@ -48,15 +53,9 @@ function App() {
     event.preventDefault();
 
     try {
-      const response = await fetch(`${URL}/start-scraper`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          search_text: newSearchText,
-          url: "https://amazon.ca",
-        }),
+      const response = await axios.post(`${URL}/start-scraper`, {
+        search_text: newSearchText,
+        url: "https://amazon.ca",
       });
 
       if (response.ok) {
@@ -87,6 +86,7 @@ function App() {
         searchTexts={searchTexts}
         onSearchTextClick={handleSearchTextClick}
       />
+      <TrackedProductList />
       {showPriceHistory && (
         <PriceHistoryTable
           priceHistory={priceHistory}
