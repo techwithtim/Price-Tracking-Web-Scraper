@@ -1,11 +1,29 @@
 from flask import Flask, jsonify, request
 import sqlite3
 import subprocess
+from flask_sqlalchemy import SQLAlchemy
 
-conn = sqlite3.connect('database.db', check_same_thread=False)
-cursor = conn.cursor()
-
+db = SQLAlchemy()
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+
+class ProductResult(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255))
+    url = db.Column(db.String(255))
+    price = db.Column(db.Float)
+    created_at = db.Column(db.DateTime)
+    search_text = db.Column(db.String(255))
+
+    def __init__(self, name, url, price, created_at, search_text):
+        self.name = name
+        self.url = url
+        self.price = price
+        self.created_at = created_at
+        self.search_text = search_text
+
+
+db.init_app(app)
 
 
 def create_model():
@@ -17,7 +35,8 @@ def create_model():
             price REAL,
             url TEXT,
             search_text TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            source TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         )
     ''')
     conn.commit()
@@ -27,17 +46,62 @@ def create_model():
 def submit_results():
     results = request.json.get('data')
     search_text = request.json.get("search_text")
+    source = request.json.get("source")
 
     for result in results:
-        cursor.execute('INSERT INTO product_results (img, name, price, url, search_text) VALUES (?, ?, ?, ?, ?)',
-                       (result['img'], result['name'], result['price'], result['url'], search_text))
+        cursor.execute('INSERT INTO product_results (img, name, price, url, search_text, source) VALUES (?, ?, ?, ?, ?, ?)',
+                       (result['img'], result['name'], result['price'], result['url'], search_text, source))
 
     conn.commit()
     response = {'message': 'Received data successfully'}
     return jsonify(response), 200
 
 
+@app.route('/unique_search_texts', methods=['GET'])
+def get_unique_search_texts():
+    # Retrieve unique values from the 'search_text' column
+    cursor.execute('SELECT DISTINCT search_text FROM product_results')
+    unique_search_texts = [row[0] for row in cursor.fetchall()]
+
+    # Return the unique search texts as a JSON response
+    return jsonify(unique_search_texts)
+
+
 @app.route('/results', methods=['GET'])
+def get_product_results():
+    search_text = request.args.get('search_text')
+
+    query = '''
+        SELECT pr.*
+        FROM product_results pr
+        INNER JOIN (
+            SELECT url, MAX(created_at) AS max_created_at
+            FROM product_results
+            WHERE search_text = ?
+            GROUP BY url
+        ) AS grouped
+        ON pr.url = grouped.url AND pr.created_at = grouped.max_created_at
+    '''
+    cursor.execute(query, (search_text,))
+    results = cursor.fetchall()
+
+    # Convert query results to a list of dictionaries
+    product_results = []
+    for row in results:
+        _id, img, name, price, url, search_text, created_at = row
+        product_results.append({
+            'id': _id,
+            'img': img,
+            'name': name,
+            'price': float(price),
+            'url': url,
+            'created_at': created_at
+        })
+
+    return jsonify(product_results)
+
+
+@app.route('/all-results', methods=['GET'])
 def get_results():
     # Retrieve all the results from the table
     cursor.execute(
