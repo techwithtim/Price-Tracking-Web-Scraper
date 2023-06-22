@@ -6,7 +6,7 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///database.db'
 
 db = SQLAlchemy(app)
 
@@ -173,7 +173,27 @@ def get_tracked_products():
     return jsonify(results), 200
 
 
+@app.route("/update-tracked-products", methods=["POST"])
+def update_tracked_products():
+    tracked_products = TrackedProducts.query.all()
+    url = "https://amazon.ca"
+
+    product_names = []
+    for tracked_product in tracked_products:
+        name = tracked_product.name
+        if not tracked_product.tracked:
+            continue
+
+        command = f"python ./scraper/__init__.py {url} \"{name}\" /results"
+        subprocess.Popen(command, shell=True)
+        product_names.append(name)
+
+    response = {'message': 'Scrapers started successfully',
+                "products": product_names}
+    return jsonify(response), 200
+
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    app.run(debug=True)
+    app.run()

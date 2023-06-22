@@ -118,7 +118,6 @@ async def main(url, search_text, response_route):
 
         results = await get_products(search_page, search_text, metadata["product_selector"], func)
         print("Saving results.")
-        save_results(results)
         post_results(results, response_route, search_text, url)
 
         await browser.close()
