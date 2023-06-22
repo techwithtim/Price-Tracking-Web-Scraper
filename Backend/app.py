@@ -1,6 +1,7 @@
 import subprocess
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
@@ -11,18 +12,20 @@ db = SQLAlchemy(app)
 class ProductResult(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(1000))
+    img = db.Column(db.String(1000))
     url = db.Column(db.String(1000))
     price = db.Column(db.Float)
-    created_at = db.Column(db.DateTime)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
     search_text = db.Column(db.String(255))
     source = db.Column(db.String(255))
 
-    def __init__(self, name, url, price, created_at, search_text):
+    def __init__(self, name, img, url, price, search_text, source):
         self.name = name
         self.url = url
+        self.img = img
         self.price = price
-        self.created_at = created_at
         self.search_text = search_text
+        self.source = source
 
 
 @app.route('/results', methods=['POST'])
@@ -35,8 +38,8 @@ def submit_results():
         product_result = ProductResult(
             name=result['name'],
             url=result['url'],
+            img=result["img"],
             price=result['price'],
-            created_at=result['created_at'],
             search_text=search_text,
             source=source
         )
@@ -58,7 +61,8 @@ def get_unique_search_texts():
 @app.route('/results')
 def get_product_results():
     search_text = request.args.get('search_text')
-    results = ProductResult.query.filter_by(search_text=search_text).all()
+    results = ProductResult.query.filter_by(search_text=search_text).order_by(
+        ProductResult.created_at.desc()).all()
 
     product_dict = {}
     for result in results:
@@ -67,6 +71,9 @@ def get_product_results():
             product_dict[url] = {
                 'name': result.name,
                 'url': result.url,
+                "img": result.img,
+                "source": result.source,
+                "created_at": result.created_at,
                 'priceHistory': []
             }
         product_dict[url]['priceHistory'].append({
@@ -88,8 +95,11 @@ def get_results():
             'name': result.name,
             'url': result.url,
             'price': result.price,
-            'date': result.created_at
-
+            "img": result.img,
+            'date': result.created_at,
+            "created_at": result.created_at,
+            "search_text": result.search_text,
+            "source": result.source
         })
 
     return jsonify(product_results)
