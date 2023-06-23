@@ -6,7 +6,6 @@ from amazon import get_product as get_amazon_product
 from requests import post
 
 AMAZON = "https://amazon.ca"
-CANADA_COMPUTERS = "https://canadacomputers.com"
 
 URLS = {
     AMAZON: {
@@ -24,7 +23,7 @@ def load_auth():
     with open(FILE, "r") as f:
         return json.load(f)
 
-
+# place your bright data credentials in auth.json file with keys: "username", "password" and "host"
 cred = load_auth()
 auth = f'{cred["username"]}:{cred["password"]}'
 browser_url = f'wss://{auth}@{cred["host"]}'
@@ -110,8 +109,8 @@ async def main(url, search_text, response_route):
         def func(x): return None
         if url == AMAZON:
             func = get_amazon_product
-        elif url == CANADA_COMPUTERS:
-            pass
+        else:
+            raise Exception('Invalid URL')
 
         results = await get_products(search_page, search_text, metadata["product_selector"], func)
         print("Saving results.")
@@ -120,4 +119,5 @@ async def main(url, search_text, response_route):
         await browser.close()
 
 if __name__ == "__main__":
+    # test script
     asyncio.run(main(AMAZON, "ryzen 9 3950x"))

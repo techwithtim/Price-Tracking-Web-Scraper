@@ -1,0 +1,5 @@
+requests
+Flask
+Flask-SQLAlchemy
+Flask-Cors
+playwright
