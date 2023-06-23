@@ -10,14 +10,9 @@ CANADA_COMPUTERS = "https://canadacomputers.com"
 
 URLS = {
     AMAZON: {
-        "search_field_id": "twotabsearchtextbox",
-        "search_button_id": "nav-search-submit-button",
+        "search_field_query": 'input[name="field-keywords"]',
+        "search_button_query": 'input[value="Go"]',
         "product_selector": "div.s-card-container"
-    },
-    CANADA_COMPUTERS: {
-        "search_field_id": "cc_quick_search",
-        "search_button_id": "search_btn",
-        "product_selector": ""
     }
 }
 
@@ -37,14 +32,16 @@ browser_url = f'wss://{auth}@{cred["host"]}'
 
 async def search(metadata, page, search_text):
     print(f"Searching for {search_text} on {page.url}")
-    search_field_id = metadata.get("search_field_id")
-    search_button_id = metadata.get("search_button_id")
+    search_field_query = metadata.get("search_field_query")
+    search_button_query = metadata.get("search_button_query")
 
-    if search_field_id:
+    if search_field_query and search_button_query:
         print("Filling input field")
-        await page.fill(f"#{search_field_id}", search_text)
+        search_box = await page.wait_for_selector(search_field_query)
+        await search_box.type(search_text)
         print("Pressing search button")
-        await page.click(f"#{search_button_id}")
+        button = await page.wait_for_selector(search_button_query)
+        await button.click()
     else:
         raise Exception("Could not search.")
 
