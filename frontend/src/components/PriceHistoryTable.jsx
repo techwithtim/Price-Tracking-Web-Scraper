@@ -24,7 +24,7 @@ function PriceHistoryTable({ priceHistory, onClose }) {
     const currentPrice = product.priceHistory[0].price;
     const lastPrice = product.priceHistory[1].price;
     const change = 100 - (currentPrice / lastPrice) * 100;
-    return change;
+    return Math.round(change * 100) / 100;
   };
 
   return (
@@ -45,12 +45,12 @@ function PriceHistoryTable({ priceHistory, onClose }) {
             const change = getPriceChange(product);
 
             return (
-              <tr key={product.url} className="row" onClick={() => openModal(product)}>
+              <tr key={product.url} className="row">
                 <td>{priceData.date}</td>
-                <td >{product.name}</td>
+                <td ><a onClick={() => openModal(product)}>{product.name}</a></td>
                 <td>${priceData.price}</td>
                 <td style={change > 0 ? { color: "red" } : { color: "green" }}>
-                  {change >= 0 ? "+" : "-"}
+                  {change >= 0 && "+" }
                   {change}%
                 </td>
               </tr>

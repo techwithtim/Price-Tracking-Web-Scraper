@@ -53,18 +53,14 @@ function App() {
     event.preventDefault();
 
     try {
-      const response = await axios.post(`${URL}/start-scraper`, {
+      await axios.post(`${URL}/start-scraper`, {
         search_text: newSearchText,
         url: "https://amazon.ca",
       });
 
-      if (response.ok) {
-        alert("Scraper started successfully");
-        setSearchTexts([...searchTexts, newSearchText]);
-        setNewSearchText("");
-      } else {
-        alert("Error starting scraper");
-      }
+      alert("Scraper started successfully");
+      setSearchTexts([...searchTexts, newSearchText]);
+      setNewSearchText("");
     } catch (error) {
       alert("Error starting scraper:", error);
     }

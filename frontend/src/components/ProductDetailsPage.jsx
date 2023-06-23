@@ -11,10 +11,34 @@ const ProductDetailsPage = ({ product }) => {
     priceHistory,
   } = product;
 
-  const dates = priceHistory.map((history) =>
-    new Date(history.date).toLocaleDateString("en-US")
-  );
-  const prices = priceHistory.map((history) => history.price);
+  function formatDate(date) {
+    var aaaa = date.getFullYear();
+    var gg = date.getDate();
+    var mm = date.getMonth() + 1;
+
+    if (gg < 10) gg = "0" + gg;
+
+    if (mm < 10) mm = "0" + mm;
+
+    var cur_day = aaaa + "-" + mm + "-" + gg;
+
+    var hours = date.getHours();
+    var minutes = date.getMinutes();
+    var seconds = date.getSeconds();
+
+    if (hours < 10) hours = "0" + hours;
+
+    if (minutes < 10) minutes = "0" + minutes;
+
+    if (seconds < 10) seconds = "0" + seconds;
+
+    return cur_day + " " + hours + ":" + minutes + ":" + seconds;
+  }
+
+  const dates = priceHistory
+    .map((history) => formatDate(new Date(history.date)))
+    .reverse();
+  const prices = priceHistory.map((history) => history.price).reverse();
 
   const chartData = {
     options: {
@@ -51,7 +75,9 @@ const ProductDetailsPage = ({ product }) => {
       </p>
       <p>Newest Price At: {createdAt}</p>
       <h2>Price History</h2>
-      <h3>Current Price: ${prices.length > 0 ? prices[0] : "N/A"}</h3>
+      <h3>
+        Current Price: ${prices.length > 0 ? prices[prices.length - 1] : "N/A"}
+      </h3>
       <ApexCharts
         options={chartData.options}
         series={chartData.series}
