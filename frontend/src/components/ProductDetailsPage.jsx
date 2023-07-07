@@ -59,7 +59,7 @@ const ProductDetailsPage = ({ product }) => {
 
   return (
     <div>
-      <h2>{name}</h2>
+      <h2 className="subtitle">{name}</h2>
       <img src={img} alt="Product" />
       <p>
         URL:{" "}

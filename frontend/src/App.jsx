@@ -3,6 +3,7 @@ import SearchTextList from "./components/SearchTextList";
 import PriceHistoryTable from "./components/PriceHistoryTable";
 import axios from "axios";
 import TrackedProductList from "./components/TrackedProductList";
+import "./App.scss";
 
 const URL = "http://localhost:5000";
 
@@ -67,29 +68,39 @@ function App() {
   };
 
   return (
-    <div className="main">
-      <h1>Product Search Tool</h1>
-      <form onSubmit={handleNewSearchTextSubmit}>
-        <label>Search for a new item:</label>
-        <input
-          type="text"
-          value={newSearchText}
-          onChange={handleNewSearchTextChange}
+    <main className="scrapper__container">
+      <header className="scrapper__header">
+        <h1 className="title">Product Search Tool</h1>
+      </header>
+      <section className="scrapper__section">
+        <form onSubmit={handleNewSearchTextSubmit} className="scrapper__search">
+          <div className="form__input">
+            <input
+              type="text"
+              id="search-text"
+              className="input"
+              value={newSearchText}
+              onChange={handleNewSearchTextChange}
+            />
+            <label>Search for a new item</label>
+          </div>
+          <button type="submit" className="btn">
+            Start Scraper
+          </button>
+        </form>
+        <SearchTextList
+          searchTexts={searchTexts}
+          onSearchTextClick={handleSearchTextClick}
         />
-        <button type="submit">Start Scraper</button>
-      </form>
-      <SearchTextList
-        searchTexts={searchTexts}
-        onSearchTextClick={handleSearchTextClick}
-      />
-      <TrackedProductList />
-      {showPriceHistory && (
-        <PriceHistoryTable
-          priceHistory={priceHistory}
-          onClose={handlePriceHistoryClose}
-        />
-      )}
-    </div>
+        <TrackedProductList />
+        {showPriceHistory && (
+          <PriceHistoryTable
+            priceHistory={priceHistory}
+            onClose={handlePriceHistoryClose}
+          />
+        )}
+      </section>
+    </main>
   );
 }
 

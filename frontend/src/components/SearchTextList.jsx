@@ -1,13 +1,17 @@
-import React from 'react';
+import React from "react";
 
 function SearchTextList({ searchTexts, onSearchTextClick }) {
   return (
     <div>
       <h2>All Products</h2>
-      <ul>
+      <ul className="product-list">
         {searchTexts.map((searchText, index) => (
-          <li key={index} onClick={() => onSearchTextClick(searchText)}>
-            <button>{searchText}</button>
+          <li
+            className="product-list__item"
+            key={index}
+            onClick={() => onSearchTextClick(searchText)}
+          >
+            <button className="btn btn--chip">{searchText}</button>
           </li>
         ))}
       </ul>
