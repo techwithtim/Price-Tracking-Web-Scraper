@@ -1,0 +1,35 @@
+.scrapper {
+  &__container {
+    @apply container p-5 m-auto;
+  }
+  &__header {
+    @apply flex justify-between items-center;
+    .title {
+      @apply text-primary;
+    }
+  }
+
+  &__search {
+    @apply flex gap-4;
+  }
+}
+.title {
+  @apply text-3xl font-bold;
+}
+
+.form__input {
+  @apply border-2 border-primary rounded-md p-2 relative;
+  label {
+    @apply absolute top-1/2 left-2 -translate-y-1/2 bg-white px-1 transition-all duration-200 ease-in-out pointer-events-none text-gray-500;
+  }
+  input {
+    @apply w-full focus:outline-none;
+  }
+  input:focus + label,
+  input:active + label {
+    @apply -translate-y-[160%] text-primary text-sm;
+  }
+}
+.product-list {
+  @apply flex flex-col gap-4;
+}

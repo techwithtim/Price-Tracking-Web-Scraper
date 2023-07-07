@@ -1,0 +1,74 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@tailwind variants;
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+
+.main {
+  padding: 5%;
+}
+
+.row td {
+  align-items: center;
+  justify-content: center;
+  padding: 15px;
+}
+
+th {
+  background-color: #f2f2f2;
+}
+
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+h {
+  &1 {
+    //implies h1
+    @apply text-3xl font-bold;
+  }
+  &2 {
+    //implies h2
+    @apply text-xl font-bold text-primary-sublime;
+  }
+  &3 {
+    @apply text-base font-medium text-primary-sublime;
+  }
+}
+.btn {
+  @apply px-3 py-1 font-medium bg-primary text-white rounded-md hover:bg-primary-shade focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75;
+  &--chip {
+    @apply bg-secondary hover:bg-secondary-shade;
+  }
+}
+section {
+  @apply p-5 flex flex-col gap-6;
+}
+.input-button-wrapper {
+  @apply flex gap-4;
+}
+.section-wrapper {
+  @apply flex flex-col gap-4;
+}
+.tracked-products {
+  @apply flex flex-col gap-2;
+  &__item {
+    @apply bg-green-100 w-fit p-1  pl-3 pr-4 flex justify-between items-center gap-4 text-green-950;
+    & input[type="checkbox"] {
+      @apply accent-primary-sublime;
+    }
+  }
+}

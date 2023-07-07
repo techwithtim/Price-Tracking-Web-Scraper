@@ -1,13 +1,13 @@
 import React, { useState } from "react";
-import ModalComponent from './Modal';
+import ModalComponent from "./Modal";
 import ProductDetailsPage from "./ProductDetailsPage";
 
 function PriceHistoryTable({ priceHistory, onClose }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentProduct, setCurrentProduct] = useState({})
+  const [currentProduct, setCurrentProduct] = useState({});
 
   const openModal = (product) => {
-    setCurrentProduct(product)
+    setCurrentProduct(product);
     setIsModalOpen(true);
   };
 
@@ -29,7 +29,7 @@ function PriceHistoryTable({ priceHistory, onClose }) {
 
   return (
     <div>
-      <h2>Price History</h2>
+      <h2 className="subtitle">Price History</h2>
       <table>
         <thead>
           <tr className="row">
@@ -47,10 +47,12 @@ function PriceHistoryTable({ priceHistory, onClose }) {
             return (
               <tr key={product.url} className="row">
                 <td>{priceData.date}</td>
-                <td ><a onClick={() => openModal(product)}>{product.name}</a></td>
+                <td>
+                  <a onClick={() => openModal(product)}>{product.name}</a>
+                </td>
                 <td>${priceData.price}</td>
                 <td style={change > 0 ? { color: "red" } : { color: "green" }}>
-                  {change >= 0 && "+" }
+                  {change >= 0 && "+"}
                   {change}%
                 </td>
               </tr>
@@ -58,7 +60,9 @@ function PriceHistoryTable({ priceHistory, onClose }) {
           })}
         </tbody>
       </table>
-      <button onClick={onClose}>Close</button>
+      <button onClick={onClose} className="btn">
+        Close
+      </button>
       <ModalComponent
         isOpen={isModalOpen}
         closeModal={closeModal}

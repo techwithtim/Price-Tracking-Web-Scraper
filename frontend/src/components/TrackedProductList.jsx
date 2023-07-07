@@ -60,29 +60,36 @@ const TrackedProductList = () => {
   };
 
   return (
-    <div>
+    <div className="section-wrapper">
       <h2>Tracked Products</h2>
-      <ul>
+      <ul className="tracked-products">
         {trackedProducts.map((product) => (
-          <li key={product.id}>
-            {product.name}{" "}
-            <input
-              type="checkbox"
-              onChange={() => handleToggleTrackedProduct(product.id)}
-              checked={product.tracked}
-            />
-          </li>
+          <label htmlFor={product.id}>
+            <li key={product.id} className="tracked-products__item">
+              <span>{product.name}</span>
+              <input
+                type="checkbox"
+                id={product.id}
+                onChange={() => handleToggleTrackedProduct(product.id)}
+                checked={product.tracked}
+              />
+            </li>
+          </label>
         ))}
       </ul>
 
-      <div>
-        <h3>Add Tracked Product</h3>
-        <input
-          type="text"
-          value={newTrackedProduct}
-          onChange={handleNewTrackedProductChange}
-        />
-        <button onClick={handleAddTrackedProduct}>Add</button>
+      <div className="input-button-wrapper">
+        <div className="form__input">
+          <input
+            type="text"
+            value={newTrackedProduct}
+            onChange={handleNewTrackedProductChange}
+          />
+          <label>Add Tracked Product</label>
+        </div>
+        <button onClick={handleAddTrackedProduct} className="btn">
+          Add
+        </button>
       </div>
     </div>
   );
