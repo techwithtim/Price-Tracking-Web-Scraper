@@ -19,7 +19,7 @@ available_urls = URLS.keys()
 
 
 def load_auth():
-    FILE = os.path.join("Scraper", "auth.json")
+    FILE = os.path.join("scraper", "auth.json")
     with open(FILE, "r") as f:
         return json.load(f)
 
@@ -54,27 +54,30 @@ async def get_products(page, search_text, selector, get_product):
     valid_products = []
     words = search_text.split(" ")
 
-    async with asyncio.TaskGroup() as tg:
-        for div in product_divs:
-            async def task(p_div):
-                product = await get_product(p_div)
+    tasks = []
 
-                if not product["price"] or not product["url"]:
-                    return
+    for div in product_divs:
+        async def task(p_div):
+            product = await get_product(p_div)
 
-                for word in words:
-                    if not product["name"] or word.lower() not in product["name"].lower():
-                        break
+            if not product["price"] or not product["url"]:
+                return
+
+            for word in words:
+                if not product["name"] or word.lower() not in product["name"].lower():
+                    break
                 else:
                     valid_products.append(product)
-            tg.create_task(task(div))
+        tasks.append(task(div))
+
+    await asyncio.gather(*tasks)
 
     return valid_products
 
 
 def save_results(results):
     data = {"results": results}
-    FILE = os.path.join("Scraper", "results.json")
+    FILE = os.path.join("scraper", "results.json")
     with open(FILE, "w") as f:
         json.dump(data, f)
 
