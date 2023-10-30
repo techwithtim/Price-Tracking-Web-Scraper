@@ -3,6 +3,7 @@ import SearchTextList from "./components/SearchTextList";
 import PriceHistoryTable from "./components/PriceHistoryTable";
 import axios from "axios";
 import TrackedProductList from "./components/TrackedProductList";
+import NotificationPreferenceForm from "./NotificationPreferenceForm";
 
 const URL = "http://localhost:5000";
 
@@ -83,6 +84,7 @@ function App() {
         onSearchTextClick={handleSearchTextClick}
       />
       <TrackedProductList />
+      <NotificationPreferenceForm />
       {showPriceHistory && (
         <PriceHistoryTable
           priceHistory={priceHistory}
