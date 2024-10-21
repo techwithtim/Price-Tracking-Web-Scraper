@@ -39,6 +39,15 @@ class TrackedProducts(db.Model):
     def __init__(self, name, tracked=True):
         self.name = name
         self.tracked = tracked
+        
+class NotificationPreference(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(255), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('tracked_products.id'), nullable=False)
+    original_price = db.Column(db.Float, nullable=False)
+    product = db.relationship('TrackedProducts', back_populates='notification_preferences')
+
+TrackedProducts.notification_preferences = db.relationship('NotificationPreference', back_populates='product')
 
 
 @app.route('/results', methods=['POST'])
@@ -191,6 +200,26 @@ def update_tracked_products():
     response = {'message': 'Scrapers started successfully',
                 "products": product_names}
     return jsonify(response), 200
+
+@app.route('/set-notification-preference', methods=['POST'])
+def set_notification_preference():
+    email = request.json.get('email')
+    product_id = request.json.get('product_id')
+    original_price = request.json.get('original_price')
+    
+    new_preference = NotificationPreference(email=email, product_id=product_id, original_price=original_price)
+    db.session.add(new_preference)
+    db.session.commit()
+    
+    return jsonify({'message': 'Notification preference set successfully'}), 200
+
+
+from apscheduler.schedulers.background import BackgroundScheduler
+from notifications import check_notifications  
+
+scheduler = BackgroundScheduler()
+scheduler.add_job(func=check_notifications, trigger="interval", minutes=60)
+scheduler.start()
 
 
 if __name__ == '__main__':
